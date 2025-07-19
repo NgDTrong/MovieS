@@ -33,13 +33,14 @@ import app.movies.Model.SliderItem;
 import app.movies.R;
 
 public class MainActivity extends AppCompatActivity {
-    RecyclerView.Adapter adapterBestMovie,adapterUpcoming,adapterCategory;
-    private RecyclerView rvBestMovie,rvCategory,rvUpdateNew;
+    RecyclerView.Adapter adapterBestMovie, adapterUpcoming, adapterCategory;
+    private RecyclerView rvBestMovie, rvCategory, rvUpdateNew;
     private RequestQueue requestQueue;
-    private StringRequest stringRequest,stringRequest2,stringRequest3;
-    private ProgressBar load1,load2,load3;
+    private StringRequest stringRequest, stringRequest2, stringRequest3;
+    private ProgressBar load1, load2, load3;
     private ViewPager2 viewPager2;
-    private Handler handler= new Handler();
+    private Handler handler = new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,47 +49,95 @@ public class MainActivity extends AppCompatActivity {
         initView();
         banners();
         sendRequest();
+        sendRequestCategory();
+        sendRequestUpcoming();
+
     }
 
+
     private void sendRequest() {
-        requestQueue= Volley.newRequestQueue(this);
+        requestQueue = Volley.newRequestQueue(this);
         load1.setVisibility(View.VISIBLE);
-        stringRequest= new StringRequest(Request.Method.GET, "https://moviesapi.ir/api/v1/movies?page", new Response.Listener<String>() {
+        stringRequest = new StringRequest(Request.Method.GET, "https://moviesapi.ir/api/v1/movies?page=1", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
-                Gson gson= new Gson();
+                Gson gson = new Gson();
                 load1.setVisibility(View.GONE);
-                ListFilm item=gson.fromJson(s,ListFilm.class);
-                adapterBestMovie= new FilmListAdapter(item);
+                ListFilm item = gson.fromJson(s, ListFilm.class);
+                adapterBestMovie = new FilmListAdapter(item);
                 rvBestMovie.setAdapter(adapterBestMovie);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 load1.setVisibility(View.GONE);
-                Log.e("TAG","onrespone"+ volleyError.toString());
+                Log.e("TAG", "onrespone" + volleyError.toString());
             }
         });
         requestQueue.add(stringRequest);
     }
 
+    private void sendRequestCategory() {
+        requestQueue = Volley.newRequestQueue(this);
+        load2.setVisibility(View.VISIBLE);
+        stringRequest2 = new StringRequest(Request.Method.GET, "https://moviesapi.ir/api/v1/movies?page=2", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                Gson gson = new Gson();
+                load2.setVisibility(View.GONE);
+                ListFilm item = gson.fromJson(s, ListFilm.class);
+                adapterCategory = new FilmListAdapter(item);
+                rvCategory.setAdapter(adapterCategory);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                load2.setVisibility(View.GONE);
+                Log.e("TAG", "onrespone" + volleyError.toString());
+            }
+        });
+        requestQueue.add(stringRequest2);
+    }
+
+    private void sendRequestUpcoming() {
+        requestQueue = Volley.newRequestQueue(this);
+        load3.setVisibility(View.VISIBLE);
+        stringRequest3 = new StringRequest(Request.Method.GET, "https://moviesapi.ir/api/v1/movies?page=3", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                Gson gson = new Gson();
+                load3.setVisibility(View.GONE);
+                ListFilm item = gson.fromJson(s, ListFilm.class);
+                adapterUpcoming = new FilmListAdapter(item);
+                rvUpdateNew.setAdapter(adapterUpcoming);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                load3.setVisibility(View.GONE);
+                Log.e("TAG", "onrespone" + volleyError.toString());
+            }
+        });
+        requestQueue.add(stringRequest3);
+    }
+
     private void banners() {
-        List<SliderItem> list= new ArrayList<>();
+        List<SliderItem> list = new ArrayList<>();
         list.add(new SliderItem(R.drawable.wide));
         list.add(new SliderItem(R.drawable.wide1));
         list.add(new SliderItem(R.drawable.wide3));
-        viewPager2.setAdapter(new SliderAdapter(list,viewPager2));
+        viewPager2.setAdapter(new SliderAdapter(list, viewPager2));
         viewPager2.setClipToPadding(false);
         viewPager2.setClipChildren(false);
         viewPager2.setOffscreenPageLimit(3);
         viewPager2.getChildAt(0).setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
-        CompositePageTransformer compositePageTransformer= new CompositePageTransformer();
+        CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
         compositePageTransformer.addTransformer(new MarginPageTransformer(40));
         compositePageTransformer.addTransformer(new ViewPager2.PageTransformer() {
             @Override
             public void transformPage(@NonNull View page, float position) {
-                float r=1-Math.abs(position);
-                page.setScaleY(0.85f+r*0.15f);
+                float r = 1 - Math.abs(position);
+                page.setScaleY(0.85f + r * 0.15f);
             }
         });
         viewPager2.setPageTransformer(compositePageTransformer);
@@ -101,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     private Runnable runSlider = new Runnable() {
         @Override
         public void run() {
@@ -125,19 +175,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        handler.postDelayed(runSlider,1000);
+        handler.postDelayed(runSlider, 1000);
     }
 
     private void initView() {
-        viewPager2=findViewById(R.id.viewSlider);
-        rvBestMovie=findViewById(R.id.rvBestMovie);
-        rvBestMovie.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
-        rvCategory=findViewById(R.id.rvCategory);
-        rvCategory.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
-        rvUpdateNew=findViewById(R.id.rvUpdateNew);
-        rvUpdateNew.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
-        load1=findViewById(R.id.progressBar1);
-        load2=findViewById(R.id.progressBar2);
-        load3=findViewById(R.id.progressBar3);
+        viewPager2 = findViewById(R.id.viewSlider);
+        rvBestMovie = findViewById(R.id.rvBestMovie);
+        rvBestMovie.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        rvCategory = findViewById(R.id.rvCategory);
+        rvCategory.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        rvUpdateNew = findViewById(R.id.rvUpdateNew);
+        rvUpdateNew.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        load1 = findViewById(R.id.progressBar1);
+        load2 = findViewById(R.id.progressBar2);
+        load3 = findViewById(R.id.progressBar3);
     }
 }

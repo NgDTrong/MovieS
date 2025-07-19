@@ -1,5 +1,6 @@
 package app.movies.Adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -36,10 +37,10 @@ public class FilmListAdapter extends RecyclerView.Adapter<FilmListAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         holder.tvTitle.setText(item.getData().get(position).getTitle());
         RequestOptions requestOptions = new RequestOptions();
-        requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(38));
+        requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(20));
         Glide.with(context)
                 .load(item.getData().get(position).getPoster())
                 .apply(requestOptions).into(holder.imgFilm);
