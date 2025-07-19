@@ -1,4 +1,4 @@
-package app.movies;
+package app.movies.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,9 +7,8 @@ import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import app.movies.R;
 
 public class IntroActivity extends AppCompatActivity {
 private Button btnStart;
