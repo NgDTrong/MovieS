@@ -21,6 +21,7 @@ import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 
+import app.movies.Adapter.ActorsListAdapter;
 import app.movies.Model.FilmItem;
 import app.movies.R;
 
@@ -58,6 +59,16 @@ public class DetailActivity extends AppCompatActivity {
                 FilmItem item=gson.fromJson(s, FilmItem.class);
                 Glide.with(DetailActivity.this)
                         .load(item.getPoster()).into(imgTitle);
+                tvTitle.setText(item.getTitle());
+                tvMovieRatting.setText(item.getImdbRating());
+                tvMovieTime.setText(item.getRuntime());
+                tvMovieActor.setText(item.getActors());
+                tvMovieSumary.setText(item.getPlot());
+                if (item.getImages()!= null){
+                    adapterActorList= new ActorsListAdapter(item.getImages());
+                    recyclerActor.setAdapter(adapterActorList);
+                }
+
             }
         }, new Response.ErrorListener() {
             @Override

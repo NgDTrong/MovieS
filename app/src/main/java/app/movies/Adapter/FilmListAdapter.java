@@ -17,6 +17,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 
+import app.movies.Activities.DetailActivity;
 import app.movies.Model.ListFilm;
 import app.movies.R;
 
@@ -47,7 +48,7 @@ public class FilmListAdapter extends RecyclerView.Adapter<FilmListAdapter.ViewHo
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent= new Intent(holder.itemView.getContext(), Deprecated.class);
+                Intent intent= new Intent(holder.itemView.getContext(), DetailActivity.class);
                 intent.putExtra("id",item.getData().get(position).getId());
                 context.startActivity(intent);
             }
