@@ -1,6 +1,8 @@
 package app.movies.Activities;
 
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -9,6 +11,7 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.NestedScrollView;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,9 +23,15 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-import app.movies.Adapter.ActorsListAdapter;
-import app.movies.Model.FilmItem;
+import java.util.ArrayList;
+
+import app.movies.Adapter.EpisodeCategory;
+import app.movies.Model.Episode;
+import app.movies.Model.FilmThum;
+import app.movies.Model.Movie;
+import app.movies.Model.ServerDatum;
 import app.movies.R;
 
 public class DetailActivity extends AppCompatActivity {
@@ -30,10 +39,10 @@ public class DetailActivity extends AppCompatActivity {
     private StringRequest stringRequest;
     private ProgressBar mProgressBar;
     private TextView tvTitle, tvMovieRatting, tvMovieTime, tvMovieSumary, tvMovieActor;
-    private int idFilm;
+    private String slugFilm;
     private ImageView imgTitle, imgBack, imgFav;
-    private RecyclerView.Adapter adapterActorList, adapterCategory;
-    private RecyclerView recyclerActor, recyclerCategory;
+    private RecyclerView.Adapter adapterActorList, adapterCategory, adapterEpisode;
+    private RecyclerView recyclerActor, recyclerCategory, recyclerEpisode;
     private NestedScrollView scrollView;
 
     @Override
@@ -41,59 +50,60 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_detail);
-        idFilm = getIntent().getIntExtra("id", 0);
+        slugFilm = getIntent().getStringExtra("slug");
         initView();
         sendRequest();
     }
 
     private void sendRequest() {
         mRequestQueue = Volley.newRequestQueue(this);
-        mProgressBar.setVisibility(View.VISIBLE);
-        scrollView.setVisibility(View.GONE);
-        stringRequest = new StringRequest(Request.Method.GET, "https://moviesapi.ir/api/v1/movies/" + idFilm, new Response.Listener<String>() {
+
+        String url = "https://phimapi.com/phim/" + slugFilm;
+        Log.d("API_LINK", "Request URL: " + url);
+
+        stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 Gson gson = new Gson();
-                mProgressBar.setVisibility(View.GONE);
-                scrollView.setVisibility(View.VISIBLE);
-                FilmItem item=gson.fromJson(s, FilmItem.class);
-                Glide.with(DetailActivity.this)
-                        .load(item.getPoster()).into(imgTitle);
-                tvTitle.setText(item.getTitle());
-                tvMovieRatting.setText(item.getImdbRating());
-                tvMovieTime.setText(item.getRuntime());
-                tvMovieActor.setText(item.getActors());
-                tvMovieSumary.setText(item.getPlot());
-                if (item.getImages()!= null){
-                    adapterActorList= new ActorsListAdapter(item.getImages());
-                    recyclerActor.setAdapter(adapterActorList);
-                }
+                FilmThum item = gson.fromJson(s, FilmThum.class);
 
+                Glide.with(DetailActivity.this)
+                        .load(item.getMovie().getPosterUrl()).into(imgTitle);
+                tvTitle.setText(item.getMovie().getName());
+                tvMovieRatting.setText(String.valueOf(item.getMovie().getTmdb().getVoteCount()));
+                tvMovieTime.setText(item.getMovie().getTime());
+                tvMovieActor.setText(TextUtils.join(", ", item.getMovie().getActor()));
+                tvMovieSumary.setText(item.getMovie().getContent());
+                if (item.getEpisodes() != null && !item.getEpisodes().isEmpty()) {
+                    adapterEpisode = new EpisodeCategory(item.getEpisodes().get(0).getServerData());
+                    recyclerEpisode.setAdapter(adapterEpisode);
+                    adapterEpisode.notifyDataSetChanged();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-
+                Log.e("API_ERROR", "onErrorResponse: " + volleyError.toString());
             }
         });
+
         mRequestQueue.add(stringRequest);
     }
 
+    //
     private void initView() {
         tvTitle = findViewById(R.id.tvMovieName);
-        mProgressBar = findViewById(R.id.progressBarDetail);
         scrollView = findViewById(R.id.scrollView2);
         imgTitle = findViewById(R.id.imgTitle);
         tvMovieRatting = findViewById(R.id.tvRatting);
         tvMovieTime = findViewById(R.id.tvTime);
         tvMovieSumary = findViewById(R.id.tvMovieSumary);
-        tvMovieActor = findViewById(R.id.tvMovieActor);
+        tvMovieActor = findViewById(R.id.tvActor);
         imgBack = findViewById(R.id.btnBack);
         imgFav = findViewById(R.id.btnFav);
-        recyclerActor = findViewById(R.id.rvImg);
-        recyclerActor.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        recyclerCategory = findViewById(R.id.rvGenre);
-        recyclerCategory.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         imgBack.setOnClickListener(v -> finish());
+        recyclerEpisode = findViewById(R.id.rvEpisode);
+        recyclerEpisode.setNestedScrollingEnabled(false);
+        recyclerEpisode.setLayoutManager(new GridLayoutManager(this, 4));
     }
 }

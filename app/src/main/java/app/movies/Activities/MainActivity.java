@@ -22,13 +22,17 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import app.movies.Adapter.CategoryAdapter;
 import app.movies.Adapter.FilmListAdapter;
 import app.movies.Adapter.SliderAdapter;
+import app.movies.Model.Category;
 import app.movies.Model.ListFilm;
+import app.movies.Model.Movie;
 import app.movies.Model.SliderItem;
 import app.movies.R;
 
@@ -58,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private void sendRequest() {
         requestQueue = Volley.newRequestQueue(this);
         load1.setVisibility(View.VISIBLE);
-        stringRequest = new StringRequest(Request.Method.GET, "https://moviesapi.ir/api/v1/movies?page=1", new Response.Listener<String>() {
+        stringRequest = new StringRequest(Request.Method.GET, "https://phimapi.com/danh-sach/phim-moi-cap-nhat-v2?page=3", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 Gson gson = new Gson();
@@ -80,13 +84,13 @@ public class MainActivity extends AppCompatActivity {
     private void sendRequestCategory() {
         requestQueue = Volley.newRequestQueue(this);
         load2.setVisibility(View.VISIBLE);
-        stringRequest2 = new StringRequest(Request.Method.GET, "https://moviesapi.ir/api/v1/movies?page=2", new Response.Listener<String>() {
+        stringRequest2 = new StringRequest(Request.Method.GET, "https://phimapi.com/the-loai", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 Gson gson = new Gson();
                 load2.setVisibility(View.GONE);
-                ListFilm item = gson.fromJson(s, ListFilm.class);
-                adapterCategory = new FilmListAdapter(item);
+                ArrayList<Movie> item = gson.fromJson(s, new TypeToken<ArrayList<Movie>>(){}.getType());
+                adapterCategory = new CategoryAdapter(item);
                 rvCategory.setAdapter(adapterCategory);
             }
         }, new Response.ErrorListener() {
@@ -102,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     private void sendRequestUpcoming() {
         requestQueue = Volley.newRequestQueue(this);
         load3.setVisibility(View.VISIBLE);
-        stringRequest3 = new StringRequest(Request.Method.GET, "https://moviesapi.ir/api/v1/movies?page=3", new Response.Listener<String>() {
+        stringRequest3 = new StringRequest(Request.Method.GET, "https://phimapi.com/danh-sach/phim-moi-cap-nhat-v2?page=1", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 Gson gson = new Gson();
@@ -161,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 viewPager2.setCurrentItem(currentItem + 1, true);
             }
-            handler.postDelayed(this, 1000);
+            handler.postDelayed(this, 3000);
         }
     };
 
