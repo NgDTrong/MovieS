@@ -1,9 +1,11 @@
 package app.movies.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,6 +46,7 @@ public class DetailActivity extends AppCompatActivity {
     private RecyclerView.Adapter adapterActorList, adapterCategory, adapterEpisode;
     private RecyclerView recyclerActor, recyclerCategory, recyclerEpisode;
     private NestedScrollView scrollView;
+    private Button btnMovie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,17 @@ public class DetailActivity extends AppCompatActivity {
         slugFilm = getIntent().getStringExtra("slug");
         initView();
         sendRequest();
+        lookMovie();
+    }
+
+    private void lookMovie() {
+        btnMovie.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent= new Intent(new DetailActivity(), PlayerActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void sendRequest() {
@@ -94,6 +108,7 @@ public class DetailActivity extends AppCompatActivity {
     private void initView() {
         tvTitle = findViewById(R.id.tvMovieName);
         scrollView = findViewById(R.id.scrollView2);
+        btnMovie=findViewById(R.id.btn_play);
         imgTitle = findViewById(R.id.imgTitle);
         tvMovieRatting = findViewById(R.id.tvRatting);
         tvMovieTime = findViewById(R.id.tvTime);

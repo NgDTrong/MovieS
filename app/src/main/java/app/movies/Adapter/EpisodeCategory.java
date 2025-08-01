@@ -1,6 +1,7 @@
 package app.movies.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,12 @@ public class EpisodeCategory extends RecyclerView.Adapter<EpisodeCategory.ViewHo
     @Override
     public void onBindViewHolder(@NonNull EpisodeCategory.ViewHolder holder, int position) {
         holder.tvEpisode.setText(list.get(position).getName());
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, app.movies.Activities.PlayerActivity.class);
+            intent.putExtra("video_url", list.get(position).getLinkM3u8()); // Gửi đường dẫn video
+//            intent.putExtra("episode_name", list.get(position).getName());  // Gửi tên tập (tùy chọn hiển thị)
+            context.startActivity(intent);
+        });
     }
 
     @Override

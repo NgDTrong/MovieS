@@ -1,10 +1,13 @@
 package app.movies.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private StringRequest stringRequest, stringRequest2, stringRequest3;
     private ProgressBar load1, load2, load3;
     private ViewPager2 viewPager2;
+    private EditText tvSearch;
     private Handler handler = new Handler();
 
     @Override
@@ -183,6 +187,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        tvSearch=findViewById(R.id.edtSearch);
+        tvSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent= new Intent(MainActivity.this, SearchActivity.class);
+                startActivity(intent);
+            }
+        });
         viewPager2 = findViewById(R.id.viewSlider);
         rvBestMovie = findViewById(R.id.rvBestMovie);
         rvBestMovie.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
