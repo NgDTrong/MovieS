@@ -10,5 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:show_buffering="when_playing"
+        app:resize_mode="fill"
+        android:keepScreenOn="true"
+        android:fitsSystemWindows="false"
         app:use_controller="true" />
 </FrameLayout>

@@ -1,8 +1,11 @@
 package app.movies.Activities;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.media3.common.MediaItem;
@@ -21,6 +24,9 @@ public class PlayerActivity extends AppCompatActivity {
 
     private PlayerView playerView;
     private ExoPlayer player;
+    private long playbackPosision = 0;
+    private boolean playWhenReady = true;
+    private String videoUrl;
 
     @OptIn(markerClass = UnstableApi.class)
     @Override
@@ -30,7 +36,7 @@ public class PlayerActivity extends AppCompatActivity {
 
         playerView = findViewById(R.id.player_view);
 
-        String videoUrl = getIntent().getStringExtra("video_url");
+        videoUrl = getIntent().getStringExtra("video_url");
         Log.d("PlayerActivity", "Received video URL: " + videoUrl);
 
         if (videoUrl == null || videoUrl.isEmpty()) {
@@ -38,8 +44,43 @@ public class PlayerActivity extends AppCompatActivity {
             finish();
             return;
         }
+        if (savedInstanceState != null) {
+            playbackPosision = savedInstanceState.getLong("playback_position", 0);
+            playWhenReady = savedInstanceState.getBoolean("play_when_ready", true);
+        }
+        initializePlayer(videoUrl);
+        applySystemUIBasedOnOrientation();
+    }
 
-         initializePlayer(videoUrl);
+    private void hideSystemUI() {
+        View decorView = getWindow().getDecorView();
+        int flags = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            decorView.setSystemUiVisibility(flags);
+        } else {
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        hideSystemUI();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (player != null) {
+            outState.putLong("playback_position", player.getCurrentPosition());
+            outState.putBoolean("play_when_ready", player.getPlayWhenReady());
+        }
+
     }
 
     @UnstableApi
@@ -66,6 +107,19 @@ public class PlayerActivity extends AppCompatActivity {
         player.setMediaItem(mediaItem);
         player.prepare();
         player.play();
+    }
+
+    private void applySystemUIBasedOnOrientation() {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            hideSystemUI(); // Xoay ngang → ẩn toàn bộ UI
+        } else {
+            showSystemUI(); // Dọc → hiển thị UI như bình thường
+        }
+    }
+
+    private void showSystemUI() {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
     }
 
     @Override

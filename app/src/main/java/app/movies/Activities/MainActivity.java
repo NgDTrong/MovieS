@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private StringRequest stringRequest, stringRequest2, stringRequest3;
     private ProgressBar load1, load2, load3;
     private ViewPager2 viewPager2;
-    private EditText tvSearch;
+    private TextView tvSearch;
     private Handler handler = new Handler();
 
     @Override
